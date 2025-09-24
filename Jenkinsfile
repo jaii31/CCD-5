@@ -5,14 +5,15 @@ pipeline {
     }
     stages {
         stage('Setup') {
-            steps {
-                echo 'Setting up Python environment...'
-                // Create virtual environment
-                bat "python -m venv %VENV%"
-                // Upgrade pip
-                bat "%VENV%\\Scripts\\pip install --upgrade pip"
+        steps {
+            echo 'Setting up Python environment...'
+            // Create virtual environment
+            bat "python -m venv %VENV%"
+            // Upgrade pip using Python directly (Windows-safe)
+                bat "%VENV%\\Scripts\\python.exe -m pip install --upgrade pip"
             }
         }
+
 
         stage('Install Dependencies') {
             steps {
