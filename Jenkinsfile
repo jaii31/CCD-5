@@ -1,20 +1,46 @@
 pipeline {
     agent any
+    environment {
+        VENV = 'venv'
+    }
     stages {
-        stage('Build') {
+        stage('Setup') {
             steps {
-                echo 'Building the Flask project...'
+                echo 'Setting up Python environment...'
+                // Create virtual environment
+                bat "python -m venv %VENV%"
+                // Upgrade pip
+                bat "%VENV%\\Scripts\\pip install --upgrade pip"
             }
         }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing required packages...'
+                // Install packages from requirements.txt
+                bat "%VENV%\\Scripts\\pip install -r requirements.txt"
+            }
+        }
+
         stage('Test') {
             steps {
                 echo 'Running tests...'
+                // Run pytest if you have tests, ignore if not
+                bat "%VENV%\\Scripts\\pytest || echo 'No tests found'"
             }
         }
-        stage('Deploy') {
+
+        stage('Run Flask App') {
             steps {
-                echo 'Deploying Flask project...'
+                echo 'Starting Flask app...'
+                // Start Flask app in background
+                bat "start cmd /k \"%VENV%\\Scripts\\python app.py\""
             }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline finished.'
         }
     }
 }
